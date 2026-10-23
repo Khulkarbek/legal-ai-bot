@@ -1,0 +1,5 @@
+aiogram==2.25.1
+groq
+pdfplumber
+python-docx
+python-dotenv

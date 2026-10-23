@@ -21,7 +21,7 @@ from docx.text.paragraph import Paragraph
 import groq
 from groq import Groq
 from aiogram import Bot, Dispatcher, executor, types
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, MenuButtonWebApp
 from aiohttp import web
 
 try:
@@ -112,7 +112,7 @@ def save_analysis_history(user_id, file_name, result):
 # ==========================================
 LANG_TEXTS = {
     'uz': {
-        'welcome': "Salom! Men shartnomalarni yuridik va faktik tahlil qiluvchi Legal AI Agentman. ⚖️\n\nShartnoma faylini (PDF yoki DOCX) yuboring yoki Legal Engineer Roadmap Mini App'ni oching.",
+        'welcome': "Salom! Men shartnomalarni yuridik va faktik tahlil qiluvchi Legal AI Agentman. ⚖️\n\nShartnoma faylini (PDF yoki DOCX) yuboring yoki pastdagi 'Ilova' tugmasi orqali menyuni oching.",
         'select_lang_first': "Iltimos, avval tilni tanlang:\n\nПожалуйста, выберите язык:\n\nPlease select language:",
         'lang_changed': "✅ Til tanlandi: O'zbekcha!\n\nEndi shartnoma faylingizni yuborishingiz mumkin.",
         'analyzing': "⚖️ Shartnoma tahlil qilinmoqda. Hajmiga qarab 1-3 daqiqa ketishi mumkin...",
@@ -132,7 +132,7 @@ LANG_TEXTS = {
         'facts_title': "SHARTNOMA MATNIDAN DASTURIY AJRATILGAN REKVIZITLAR",
     },
     'ru': {
-        'welcome': "Здравствуйте! Я Legal AI Agent: юридический и фактический анализ договоров. ⚖️\n\nОтправьте файл договора (PDF или DOCX) или откройте Mini App Roadmap.",
+        'welcome': "Здравствуйте! Я Legal AI Agent: юридический и фактический анализ договоров. ⚖️\n\nОтправьте файл договора (PDF или DOCX) или откройте Mini App через кнопку 'Ilova'.",
         'select_lang_first': "Пожалуйста, выберите язык:",
         'lang_changed': "✅ Выбран язык: Русский!\n\nТеперь вы можете отправить файл договора.",
         'analyzing': "⚖️ Договор анализируется. В зависимости от объёма это займёт 1-3 минуты...",
@@ -152,7 +152,7 @@ LANG_TEXTS = {
         'facts_title': "РЕКВИЗИТЫ, ИЗВЛЕЧЕННЫЕ ПРОГРАММНО ИЗ ТЕКСТА ДОГОВОРА",
     },
     'en': {
-        'welcome': "Hello! I'm the Legal AI Agent for legal and factual contract analysis. ⚖️\n\nSend your contract (PDF or DOCX) or open the Roadmap Mini App.",
+        'welcome': "Hello! I'm the Legal AI Agent for legal and factual contract analysis. ⚖️\n\nSend your contract (PDF or DOCX) or open the Mini App via 'Ilova'.",
         'select_lang_first': "Please select your language:",
         'lang_changed': "✅ Language selected: English!\n\nYou can now upload your contract file.",
         'analyzing': "⚖️ Analyzing the contract. Depending on length this may take 1-3 minutes...",
@@ -796,6 +796,18 @@ async def cmd_roadmap(message: types.Message):
     )
 
 
+@dp.message_handler(content_types=types.ContentType.WEB_APP_DATA)
+async def handle_web_app_data(message: types.Message):
+    data = message.web_app_data.data
+    
+    if data == "shartnoma_tahlili":
+        await message.answer("📄 Iltimos, tahlil qilish uchun shartnoma faylini (PDF yoki DOCX) chatga yuboring!")
+    elif data == "pdf_converter":
+        await message.answer("🔄 PDF Converter bo'limi: Iltimos, PDF formatiga o'tkazmoqchi bo'lgan faylingizni yuboring.")
+    elif data == "open_roadmap":
+        await message.answer("🚀 Legal Engineer Roadmap orqali o'qishni boshlang!")
+
+
 @dp.message_handler(content_types=types.ContentType.DOCUMENT)
 async def handle_document(message: types.Message):
     user_id = message.from_user.id
@@ -912,6 +924,7 @@ def run_web_server():
             
     loop.run_until_complete(main())
 
+
 if __name__ == '__main__':
     web_thread = threading.Thread(target=run_web_server, daemon=True)
     web_thread.start()
@@ -924,7 +937,6 @@ if __name__ == '__main__':
     
     async def set_menu():
         try:
-            from aiogram.types import MenuButtonWebApp, WebAppInfo
             await bot.set_chat_menu_button(
                 menu_button=MenuButtonWebApp(text="Ilova", web_app=WebAppInfo(url=WEB_APP_URL))
             )

@@ -78,6 +78,7 @@
             font-size: 13px;
             cursor: pointer;
             transition: transform 0.2s;
+            text-decoration: none;
         }
 
         .donate-btn:active {
@@ -100,7 +101,7 @@
             justify-content: space-between;
             min-height: 130px;
             cursor: pointer;
-            transition: transform 0.2s, filter 0.2s;
+            transition: transform 0.2s;
             position: relative;
             overflow: hidden;
         }
@@ -128,14 +129,8 @@
 
         /* Card Gradients */
         .card-contract { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); }
-        .card-claims { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
-        .card-pdf { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
-        .card-roadmap { background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); grid-column: span 2; min-height: 100px; flex-direction: row; align-items: center; }
-
-        .card-roadmap .card-content {
-            display: flex;
-            flex-direction: column;
-        }
+        .card-pdf { background: linear-gradient(135deg, #10b981 0%, #059669 100%); grid-column: span 2; }
+        .card-roadmap { background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); grid-column: span 2; }
 
         .badge {
             position: absolute;
@@ -167,6 +162,7 @@
             display: flex;
             justify-content: center;
             gap: 16px;
+            align-items: center;
         }
 
         .contact-link {
@@ -174,7 +170,31 @@
             text-decoration: none;
             font-size: 14px;
             font-weight: 500;
+            cursor: pointer;
         }
+
+        /* Toast notification */
+        #toast {
+            visibility: hidden;
+            min-width: 200px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 10px;
+            position: fixed;
+            z-index: 1;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            font-size: 13px;
+        }
+        #toast.show {
+            visibility: visible;
+            animation: fadein 0.5s, fadeout 0.5s 2.5s;
+        }
+        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
+        @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
     </style>
 </head>
 <body>
@@ -184,13 +204,13 @@
         <p>Barcha huquqiy xizmatlar va bo'limlar shu yerda</p>
     </div>
 
-    <!-- Donat Banner -->
+    <!-- Donat Banner (O'zingizning to'lov havolangizni href ga yozing) -->
     <div class="donate-banner">
         <div class="donate-info">
             <h3>Botni qo'llab-quvvatlang</h3>
             <p>Server va yangi funksiyalar uchun</p>
         </div>
-        <button class="donate-btn" onclick="openDonate()">Donat</button>
+        <a href="https://click.uz" target="_blank" class="donate-btn">Donat</a>
     </div>
 
     <!-- Asosiy Bo'limlar Grid -->
@@ -204,27 +224,18 @@
             </div>
         </div>
 
-        <!-- 2-Bo'lim: Da'vo ariza shablonlari -->
-        <div class="card card-claims" onclick="sendAction('ariza')">
-            <div class="card-icon">✍️</div>
-            <div>
-                <div class="card-title">Da'vo arizalar</div>
-                <div class="card-desc">Sud va shikoyat shablonlari</div>
-            </div>
-        </div>
-
-        <!-- 3-Bo'lim: Barcha fayllarni PDFga o'zgartirish -->
+        <!-- 2-Bo'lim: Barcha fayllarni PDFga o'zgartirish -->
         <div class="card card-pdf" onclick="sendAction('pdf')">
             <div class="card-icon">🔄</div>
             <div>
-                <div class="card-title">PDF Converter</div>
-                <div class="card-desc">Fayllarni PDF formatiga o'tkazish</div>
+                <div class="card-title">PDF Converter (Fayllarni PDFga o'tkazish)</div>
+                <div class="card-desc">Word, rasm va boshqa formatlarni PDFga o'zgartirish</div>
             </div>
             <span class="badge">YANGI</span>
         </div>
 
         <!-- Roadmap -->
-        <div class="card card-roadmap" onclick="alert('Legal Engineer Roadmap bo\'limi tez orada ishga tushadi!')">
+        <div class="card card-roadmap" onclick="sendAction('roadmap')">
             <div style="display: flex; align-items: center; gap: 16px;">
                 <div class="card-icon" style="margin: 0;">🚀</div>
                 <div>
@@ -239,30 +250,35 @@
     <div class="footer">
         <p>Murojaat va savollar uchun:</p>
         <div class="contact-links">
-            <a href="tel:+998998866353" class="contact-link">📞 +998 99 886 63 53</a>
+            <a href="tel:+998998866353" class="contact-link" onclick="copyText('+998998866353', event)">📞 +998 99 886 63 53</a>
             <a href="https://t.me/abdullayev_sk" target="_blank" class="contact-link">✈️ @abdullayev_sk</a>
         </div>
     </div>
+
+    <div id="toast">Telefon raqam nusxalandi!</div>
 
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
 
-        function openDonate() {
-            // Bu yerga o'zigizning donat havolangizni (Click, Payme yoki Stripe ssilkasini) qo'yasiz
-            window.open('https://www.uzum.uz', '_blank'); 
-        }
-
         function sendAction(action) {
-            // Mini App ichidan botga xabar yuborish yoki funksiyani bajarish
             if (action === 'shartnoma') {
                 tg.sendData("shartnoma_tahlili");
-            } else if (action === 'ariza') {
-                tg.sendData("davo_ariza");
             } else if (action === 'pdf') {
                 tg.sendData("pdf_converter");
+            } else if (action === 'roadmap') {
+                tg.sendData("open_roadmap");
             }
             tg.close();
+        }
+
+        function copyText(text, event) {
+            // Agar foydalanuvchi ustiga bossa, buferga nusxalaydi
+            navigator.clipboard.writeText(text).then(() => {
+                let toast = document.getElementById("toast");
+                toast.className = "show";
+                setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
+            });
         }
     </script>
 </body>

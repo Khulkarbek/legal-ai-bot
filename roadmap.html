@@ -1,143 +1,269 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Road map for Legal Engineering</title>
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<style>
-:root{--bg:#f6f8fc;--cd:#fff;--tx:#14213d;--mu:#5b6b85;--ac:#0f2c59;--ln:#d9e0ec;--ok:#1a7f4b;--wr:#9a3412}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1524;--cd:#17213a;--tx:#e8eefb;--mu:#9aabc7;--ac:#7fb0ff;--ln:#2a3858;--ok:#4cd08a;--wr:#fdba74}}
-:root[data-theme="dark"]{--bg:#0e1524;--cd:#17213a;--tx:#e8eefb;--mu:#9aabc7;--ac:#7fb0ff;--ln:#2a3858;--ok:#4cd08a;--wr:#fdba74}
-*{box-sizing:border-box}html,body{margin:0}
-body{background:var(--bg);color:var(--tx);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:env(safe-area-inset-top,0px) 14px env(safe-area-inset-bottom,0px)}
-main{max-width:720px;margin:0 auto;padding:14px 0 30px}
-h1{font-size:23px;margin:4px 0;color:var(--ac);text-align:center}
-.sub{color:var(--mu);font-size:14px;text-align:center;margin:0 0 12px}
-.lang{display:flex;gap:8px;justify-content:center;margin:8px 0}
-.lang button{border:1px solid var(--ln);background:var(--cd);color:var(--tx);padding:6px 14px;border-radius:20px;cursor:pointer}
-.lang button.on{background:var(--ac);color:var(--bg)}
-.card{background:var(--cd);border:1px solid var(--ln);border-radius:14px;padding:14px;margin:0 0 14px}
-.card h2{font-size:17px;margin:0 0 4px;color:var(--ac)}
-.gl{margin:6px 0;font-size:14px}.gl b{color:var(--ac)}
-.bar{height:8px;background:var(--ln);border-radius:8px;overflow:hidden}
-.bar i{display:block;height:100%;width:0;background:var(--ok);transition:width .3s}
-.pc{font-size:13px;color:var(--mu);text-align:right;margin:2px 0 12px}
-.tl{border-left:3px solid var(--ln);margin-left:14px;padding-left:16px}
-.st{position:relative}
-.st:before{content:attr(data-n);position:absolute;left:-36px;top:12px;width:32px;height:32px;border-radius:50%;background:var(--ac);color:var(--bg);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}
-.st.done:before{background:var(--ok)}
-.tm{font-size:12px;color:var(--mu);margin-bottom:6px}
-.goal{background:var(--bg);border-left:3px solid var(--ac);padding:8px 10px;border-radius:6px;margin:6px 0;font-size:15px}
-details{border-top:1px solid var(--ln);padding:8px 0}
-summary{cursor:pointer;font-weight:600;color:var(--ac);font-size:15px}
-details ul,details ol{margin:6px 0 2px 18px;padding:0;font-size:15px}
-details li{margin-bottom:6px}
-pre{background:var(--bg);border:1px solid var(--ln);border-radius:8px;padding:10px;overflow-x:auto;font-size:13px;line-height:1.45}
-.er li::marker{color:var(--wr)}
-.rs a{display:block;margin:6px 0;padding:8px 10px;border:1px solid var(--ln);border-radius:10px;font-size:14px;color:var(--ac);text-decoration:none}
-.rs a span{display:block;color:var(--mu);font-size:12px}
-label.ck{display:flex;gap:8px;align-items:center;margin-top:10px;font-size:14px;color:var(--mu);cursor:pointer}
-.ft{font-size:12px;color:var(--mu);text-align:center}
-a.more{display:inline-block;margin:6px 0;color:var(--ac);font-weight:600;font-size:14px;text-decoration:none}
-.nav{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}
-.nav a,.nav button{border:1px solid var(--ln);background:var(--cd);color:var(--ac);padding:7px 14px;border-radius:20px;font-size:14px;text-decoration:none;cursor:pointer}
-@media print{:root{--bg:#fff;--cd:#fff;--tx:#000;--mu:#444;--ac:#0f2c59;--ln:#bbb}
-.lang,.nav,.ck,.bar,.pc,a.more{display:none!important}.card{break-inside:avoid;border:1px solid #ccc}.tl{border:0;margin:0;padding:0}.st:before{display:none}body{font-size:12px}}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Legal AI Assistant - Dashboard</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --bg-color: var(--tg-theme-bg-color, #0f172a);
+            --text-color: var(--tg-theme-text-color, #f8fafc);
+            --hint-color: var(--tg-theme-hint-color, #94a3b8);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 16px;
+            padding-bottom: 40px;
+        }
+
+        .header {
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .header p {
+            color: var(--hint-color);
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        /* Donat Banner */
+        .donate-banner {
+            background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+            border-radius: 20px;
+            padding: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 25px -5px rgba(244, 63, 94, 0.4);
+        }
+
+        .donate-info h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 4px;
+        }
+
+        .donate-info p {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .donate-btn {
+            background: #ffffff;
+            color: #e11d48;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .donate-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Grid Cards */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            border-radius: 20px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 130px;
+            cursor: pointer;
+            transition: transform 0.2s, filter 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:active {
+            transform: scale(0.97);
+        }
+
+        .card-icon {
+            font-size: 28px;
+            margin-bottom: 12px;
+        }
+
+        .card-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 4px;
+        }
+
+        .card-desc {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.75);
+        }
+
+        /* Card Gradients */
+        .card-contract { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); }
+        .card-claims { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+        .card-pdf { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+        .card-roadmap { background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); grid-column: span 2; min-height: 100px; flex-direction: row; align-items: center; }
+
+        .card-roadmap .card-content {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        /* Footer Contacts */
+        .footer {
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 16px;
+            margin-top: 20px;
+        }
+
+        .footer p {
+            font-size: 13px;
+            color: var(--hint-color);
+            margin-bottom: 8px;
+        }
+
+        .contact-links {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+        }
+
+        .contact-link {
+            color: #38bdf8;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+    </style>
 </head>
 <body>
-<main>
-<h1 id="h"></h1><p class="sub" id="s"></p>
-<div class="lang" id="lg"></div>
-<div id="intro"></div>
-<div class="bar"><i id="b"></i></div><div class="pc" id="pc"></div>
-<div class="tl" id="tl"></div>
-<div class="ft" id="ft"></div>
-</main>
-<script src="roadmap-ru.js"></script>
-<script src="roadmap-en.js"></script>
-<script>
-const tg=window.Telegram&&window.Telegram.WebApp;try{tg&&tg.ready()&&tg.expand()}catch(e){}
-const SH=[
-{i:"🧭",m:"2 hafta"},{i:"📚",m:"3–4 oy"},{i:"💻",m:"3 oy"},{i:"⚙️",m:"2–3 oy"},{i:"🤖",m:"3 oy"},{i:"🚀",m:"2 oy"}];
-const D={uz:{
-h:"Legal Engineering road map",s:"0 dan boshlab legal engineer bo‘lish: qadam-baqadam yo‘l",
-ck:"Bu bosqichni tugatdim",ft:"Umumiy muddat: taxminan 14–18 oy (haftasiga 8–10 soat). Shoshilmang, har bosqichda mini-loyiha qiling.",
-lblW:"📅 Haftalik reja",lblE:"🛠 Amaliy mini-loyiha",lblX:"⚠️ Tipik xatolar",lblO:"✅ Tayyor ekanligingizni qanday bilasiz",lblR:"🔗 Manbalar",
-introT:"Legal engineer kim?",
-intro:"Yurist “bu band xavfli” deb baho beradi. Legal engineer esa shu bahoni takrorlanadigan dasturga yoki jarayonga aylantiradi, shunda minglab shartnomada bir xil tekshiruv avtomatik bajariladi. Kundalik ishi: shartnoma shablonlari yaratish, hujjatlarni avtomatik tayyorlash, shartnomani tahlil qiluvchi bot (sizniki kabi) qurish, tasdiqlash jarayonlarini tartibga solish.",
-gl:[["Legal tech","yuridik ishni yengillashtiradigan dasturlar"],["Legal ops","yuridik bo‘limning ish jarayonlarini boshqarish"],["CLM","shartnomalar hayotiy sikli (tuzish, tasdiqlash, saqlash, muddat nazorati) tizimi"],["Regex","matndan INN, sana kabi namunalarni topish qoidasi"],["Gallyutsinatsiya","AI ishonch bilan aytgan, lekin to‘qilgan ma’lumot"]],
-st:[
-{t:"Soha bilan tanishish",g:"Bu kasb aynan nima qilishini va sizga mosligini tushunish. Hali kod yozmaysiz.",
-w:["1-hafta: “legal tech nima” mavzusida 3–4 maqola o‘qing. 5 ta legal tech kompaniyasi saytini ko‘rib, har biri qaysi muammoni hal qilishini bir jumlada yozing.","2-hafta: LinkedIn da “legal engineer”, “legal operations”, “contract automation” deb qidiring. 10 ta e’londagi talablarni daftarga ko‘chirib, eng ko‘p takrorlanganlarini belgilang. Bu sizning o‘quv xaritangiz bo‘ladi."],
-ex:["Bitta oddiy jarayonni tanlang, masalan “NDA ni tasdiqlash”.","Uni qog‘ozga chizing: kim so‘raydi, kim o‘qiydi, kim imzolaydi.","Qayerda kutish yoki takror ish bor? Aynan shu joylar avtomatlashtirish nuqtalaridir."],
-er:["Darhol kod yozishga shoshilish. Muammoni bilmasangiz, dastur keraksiz bo‘ladi.","Faqat texnologiyani o‘rganib, yuristlar bilan gaplashmaslik."],
-ok:["Legal engineer nima qilishini 3 jumlada tushuntira olasiz","Bitta jarayonni chizib, kamida 2 ta kechikish joyini topgansiz"],
-r:[["Stanford CodeX","https://law.stanford.edu/codex-the-stanford-center-for-legal-informatics/","Huquq va texnologiya bo‘yicha tadqiqotlar, maqolalar"],["Legal Design Lab","https://www.legaltechdesign.com/","Yuridik hujjatlarni tushunarli qilish g‘oyalari"]]},
-{t:"Huquqiy asos",g:"Avtomatlashtirishdan oldin shartnoma qanday tuzilishini va qayeri xavfli bo‘lishini tushunish.",
-w:["1–3-hafta: Fuqarolik kodeksining majburiyatlar va shartnoma qismi. Har kuni 1 bob o‘qing, oxirida 5 qatorlik xulosa yozing.","4–6-hafta: shartnoma tuzilishi: taraflar, predmet, narx, muddat, javobgarlik, nizolar, rekvizitlar. 10 ta real shartnomani shu qismlarga bo‘lib chiqing.","7–10-hafta: xavfli bandlar: bir tomonlama bekor qilish, haddan katta penya, noaniq muddat, nizo ko‘riladigan joy, avtomatik uzaytirish.","11–14-hafta: Lex.uz da qidirish, hujjat o‘zgarishlari tarixini ko‘rish, shaxsiy ma’lumotlar to‘g‘risidagi qonun bilan tanishish."],
-ex:["“Risk jadvali”: 20 ta shartnomani oling (shaxsiy ma’lumotlarni o‘chirib).","Jadval ustunlari: band raqami, band turi, xavf darajasi (past/o‘rta/yuqori), sababi.","Oxirida qaysi band turlari eng ko‘p xavf tug‘dirishini ko‘rasiz. Bu keyin AI ga beriladigan qoidalar to‘plamiga aylanadi."],
-er:["Modda raqamlarini yoddan yozish. Har doim Lex.uz dan tekshiring.","Faqat nazariya o‘qib, real shartnomalarni ko‘rmaslik."],
-ok:["Shartnomani 6–7 asosiy qismga bo‘la olasiz","Xavfli bandning 5 ta turini misol bilan ayta olasiz","Kerakli normani Lex.uz da 2 daqiqada topasiz"],
-r:[["Lex.uz","https://lex.uz/","O‘zbekiston qonunchiligi, rasmiy manba"],["CUAD dataset","https://www.atticusprojectai.com/cuad","510 ta real shartnoma va band turlari, o‘rganish uchun ajoyib"]]},
-{t:"Dasturlash asoslari",g:"Shartnoma matnini o‘qiydigan, ma’lumot topadigan va saqlaydigan dastur yozishni o‘rganish.",
-w:["1–3-hafta: Python: o‘zgaruvchi, ro‘yxat, lug‘at, sikl, funksiya. Har kuni 1 ta kichik masala yeching.","4–5-hafta: fayllar: DOCX o‘qish (python-docx), PDF o‘qish (pdfplumber).","6–8-hafta: regex: 9 xonali INN, sana, summa. regex101.com da mashq qiling.","9–10-hafta: SQLite (jadval yaratish, yozish, qidirish) va Git/GitHub (commit, push).","11–12-hafta: pastdagi mini-loyihani tugating."],
-ex:["“Rekvizit topuvchi”: dastur DOCX shartnomani o‘qib, INN va sanalarni chiqaradi.","Shu yondashuv botingizdagi extract_facts funksiyasida ishlatilgan.","Qoida: regex topgan qiymat AI taxminidan ishonchliroq."],
-code:"import re, docx\n\nd = docx.Document('shartnoma.docx')\nmatn = '\\n'.join(p.text for p in d.paragraphs)\n\ninn = re.findall(r'\\b\\d{9}\\b', matn)\nsana = re.findall(r'\\d{2}\\.\\d{2}\\.\\d{4}', matn)\nprint('INN:', inn)\nprint('Sanalar:', sana)",
-er:["Hamma narsani yodlashga urinish. Hujjatdan qidirib ishlatish normal.","Video ko‘rib, o‘zi yozmaslik. Har darsdan keyin kodni qayta yozing."],
-ok:["50 qatorli dasturni noldan yoza olasiz","Regex bilan INN va sanani topasiz","SQLite ga yozib, qaytib o‘qiy olasiz"],
-r:[["CS50 Python","https://cs50.harvard.edu/python/","Bepul, tushunarli Python kursi"],["SQLBolt","https://sqlbolt.com/","Interaktiv SQL mashqlari"],["regex101","https://regex101.com/","Regex ni jonli sinab ko‘rish"]]},
-{t:"Hujjat va jarayonlarni avtomatlashtirish",g:"Shablondan tayyor hujjat yaratish va ish oqimini (tasdiqlash, eslatma) qurish.",
-w:["1–2-hafta: shablon: shartnomadagi o‘zgaruvchi joylarni {{nom}}, {{summa}}, {{sana}} deb belgilang.","3–4-hafta: python-docx bilan shablondan Word fayl yarating (sizning bot ham shunday qiladi).","5–6-hafta: savolnoma → hujjat: foydalanuvchi savollarga javob beradi, dastur hujjat tayyorlaydi (docassemble yoki Telegram bot).","7–10-hafta: ish oqimi: tasdiqlash bosqichlari, muddat eslatmalari, n8n yoki Zapier bilan ulash."],
-ex:["“Mehnat shartnomasi generatori”: bot 6 ta savol so‘raydi (ism, lavozim, maosh, boshlanish sanasi, sinov muddati, ish vaqti).","Dastur javoblarni shablonga qo‘yib, Word fayl yuboradi.","Qo‘shimcha: sinov muddati yo‘q bo‘lsa, shu band hujjatdan chiqib ketadi (shartli blok)."],
-er:["Yurist ko‘rmagan shablonni ishlatish.","Har holat uchun alohida shablon yaratish. Buning o‘rniga shartli bloklardan foydalaning."],
-ok:["Savollar asosida hujjat yaratadigan bot qurgansiz","Shablonda shartli blok ishlata olasiz","Jarayonda qayerda eslatma kerakligini aniqlay olasiz"],
-r:[["docassemble","https://docassemble.org/","Savolnomadan hujjat yaratuvchi ochiq tizim"],["python-docx","https://python-docx.readthedocs.io/","Word fayllarni dasturda yaratish"],["n8n","https://n8n.io/","Jarayonlarni kodsiz ulash vositasi"]]},
-{t:"AI va matn tahlili",g:"Til modellari yordamida shartnomani tahlil qilish va natijani ishonchli qilish.",
-w:["1–2-hafta: model qanday ishlashini va nega xato qilishini (gallyutsinatsiya) tushuning.","3–4-hafta: prompt: aniq rol, qoidalar, javob strukturasi. Muhim qoida: “faqat matndagi ma’lumotga tayan”.","5–7-hafta: uzun shartnomani bo‘laklarga bo‘lish, har bo‘lakdan qaydlar olish, so‘ng yakuniy tahlil (botingizdagi usul).","8–10-hafta: tekshiruv: javobni JSON qilish, regex bilan solishtirish, matnda topilmagan raqamlarni belgilash.","11–12-hafta: baholash: 20 ta shartnomada natijani qo‘lda tekshirib, xatolar jadvalini yuriting."],
-ex:["“Ishonchli taraflar ajratuvchisi”: model taraflar nomi, INN va manzilini JSON qilib beradi.","Dastur har bir qiymat shartnoma matnida bor-yo‘qligini tekshiradi.","Topilmasa [tekshiring] belgisi qo‘yiladi. Botingizdagi build_parties aynan shu g‘oya."],
-code:"qiymat = taraf['inn']\nif qiymat and qiymat not in matn:\n    taraf['inn'] += ' [tekshiring]'",
-er:["Modelga ko‘r-ko‘rona ishonish.","Maxfiy shartnomalarni rozilik va xavfsizlik tekshirmasdan tashqi xizmatga yuborish."],
-ok:["Promptni qoidalar bilan yoza olasiz","Model natijasini dastur bilan tekshirasiz","20 ta shartnomada xato foizini hisoblagansiz"],
-r:[["LegalBench","https://hazyresearch.stanford.edu/legalbench/","Modellarning huquqiy topshiriqlardagi sinov to‘plami"],["Groq Docs","https://console.groq.com/docs","Botingiz ishlatadigan API hujjatlari"],["Anthropic Docs","https://docs.claude.com/","Prompt yozish bo‘yicha qo‘llanma"]]},
-{t:"Portfolio va ish topish",g:"Qilgan ishlaringizni ish beruvchiga ishonchli ko‘rsatish.",
-w:["1–2-hafta: 3 ta loyihani GitHub ga README bilan joylang: muammo, yechim, natija, skrinshot.","3–4-hafta: har loyiha uchun 2 daqiqalik demo video yozing.","5–6-hafta: LinkedIn profilini to‘ldiring, legal tech jamoalari va chatlarida qatnashing.","7–8-hafta: intervyuga tayyorlanish: har loyihani yurist tilida tushuntirib mashq qiling."],
-ex:["“Legal AI Agent” loyihangizni case study qilib yozing.","Tuzilishi: muammo (yurist 1 shartnomaga 1 soat sarflaydi), yechim (bot), natija (3 daqiqa), cheklov (yurist tekshiruvi shart).","Cheklovlarni ochiq yozish sizga ishonchni oshiradi."],
-er:["Loyihani README siz tashlab qo‘yish.","Faqat texnik tilda yozish. Yuristlar ham o‘qiydi."],
-ok:["GitHub da 3 ta tushunarli loyihangiz bor","Har loyihani 1 daqiqada tushuntira olasiz","Kamida 5 ta kompaniyaga murojaat qilgansiz"],
-r:[["GitHub","https://github.com/","Loyihalarni joylash"],["LinkedIn","https://www.linkedin.com/","Ish e’lonlari va tarmoq"]]}]}};
-Object.assign(D,window.RM||{});
-const UI={uz:{more:"Bosqich sahifasini ochish",back:"← Barcha bosqichlar",pdf:"📄 PDF sifatida saqlash"},ru:{more:"Открыть страницу этапа",back:"← Все этапы",pdf:"📄 Сохранить как PDF"},en:{more:"Open stage page",back:"← All stages",pdf:"📄 Save as PDF"}};
-const LN={uz:"O‘zbekcha",ru:"Русский",en:"English"};
-const $=id=>document.getElementById(id);
-const li=a=>a.map(x=>`<li>${x}</li>`).join("");
-let lang="uz",done={};
-try{lang=localStorage.getItem("rm_lang")||"uz";done=JSON.parse(localStorage.getItem("rm_done")||"{}")}catch(e){}
-if(!D[lang])lang="uz";
-function save(){try{localStorage.setItem("rm_lang",lang);localStorage.setItem("rm_done",JSON.stringify(done))}catch(e){}}
-function render(){
-const d=D[lang];document.documentElement.lang=lang;document.title=d.h;
-$("h").textContent="⚖️ "+d.h;$("s").textContent=d.s;$("ft").textContent=d.ft;
-$("lg").innerHTML=Object.keys(D).length>1?Object.keys(D).map(k=>`<button class="${k===lang?"on":""}" data-l="${k}">${LN[k]}</button>`).join(""):"";
-const U=UI[lang],H=(location.hash.match(/^#s([1-6])$/)||[])[1];
-const nav=`<div class="nav">${H?`<a href="#">${U.back}</a>`:""}<button onclick="window.print()">${U.pdf}</button></div>`;
-$("intro").innerHTML=nav+(H?"":`<div class="card"><h2>${d.introT}</h2><p>${d.intro}</p>${d.gl.map(g=>`<div class="gl"><b>${g[0]}:</b> ${g[1]}</div>`).join("")}</div>`);
-$("tl").innerHTML=d.st.map((s,i)=>{if(H&&+H!==i+1)return "";const x=SH[i];
-return `<section class="card st${done[i]?" done":""}" data-n="${i+1}"><h2>${x.i} ${s.t}</h2><div class="tm">⏱ ${x.m}</div><div class="goal">🎯 ${s.g}</div>${H?"":`<a class="more" href="#s${i+1}">${U.more} →</a>`}
-<details open><summary>${d.lblW}</summary><ul>${li(s.w)}</ul></details>
-<details${H?" open":""}><summary>${d.lblE}</summary><ol>${li(s.ex)}</ol>${s.code?`<pre>${s.code.replace(/</g,"&lt;")}</pre>`:""}</details>
-<details${H?" open":""}><summary>${d.lblX}</summary><ul class="er">${li(s.er)}</ul></details>
-<details${H?" open":""}><summary>${d.lblO}</summary><ul>${li(s.ok)}</ul></details>
-<details${H?" open":""}><summary>${d.lblR}</summary><div class="rs">${s.r.map(r=>`<a href="${r[1]}" target="_blank" rel="noopener">${r[0]} ↗<span>${r[2]}</span></a>`).join("")}</div></details>
-<label class="ck"><input type="checkbox" data-i="${i}" ${done[i]?"checked":""}> ${d.ck}</label></section>`}).join("");
-const n=Object.values(done).filter(Boolean).length,p=Math.round(n*100/d.st.length);
-$("b").style.width=p+"%";$("pc").textContent=n+"/"+d.st.length+" · "+p+"%";}
-document.addEventListener("click",e=>{const l=e.target.dataset&&e.target.dataset.l;if(l){lang=l;save();render()}});
-document.addEventListener("change",e=>{const i=e.target.dataset&&e.target.dataset.i;if(i!==undefined){done[i]=e.target.checked;save();render()}});
-window.addEventListener("hashchange",()=>{render();window.scrollTo(0,0)});
-window.onbeforeprint=()=>document.querySelectorAll("details").forEach(x=>x.open=true);
-render();
-</script>
+
+    <div class="header">
+        <h1>Legal AI Assistant ⚖️</h1>
+        <p>Barcha huquqiy xizmatlar va bo'limlar shu yerda</p>
+    </div>
+
+    <!-- Donat Banner -->
+    <div class="donate-banner">
+        <div class="donate-info">
+            <h3>Botni qo'llab-quvvatlang</h3>
+            <p>Server va yangi funksiyalar uchun</p>
+        </div>
+        <button class="donate-btn" onclick="openDonate()">Donat</button>
+    </div>
+
+    <!-- Asosiy Bo'limlar Grid -->
+    <div class="grid">
+        <!-- 1-Bo'lim: Shartnomalarni tahlil qilish -->
+        <div class="card card-contract" onclick="sendAction('shartnoma')">
+            <div class="card-icon">📄</div>
+            <div>
+                <div class="card-title">Shartnoma tahlili</div>
+                <div class="card-desc">PDF va Word yuridik ekspertizasi</div>
+            </div>
+        </div>
+
+        <!-- 2-Bo'lim: Da'vo ariza shablonlari -->
+        <div class="card card-claims" onclick="sendAction('ariza')">
+            <div class="card-icon">✍️</div>
+            <div>
+                <div class="card-title">Da'vo arizalar</div>
+                <div class="card-desc">Sud va shikoyat shablonlari</div>
+            </div>
+        </div>
+
+        <!-- 3-Bo'lim: Barcha fayllarni PDFga o'zgartirish -->
+        <div class="card card-pdf" onclick="sendAction('pdf')">
+            <div class="card-icon">🔄</div>
+            <div>
+                <div class="card-title">PDF Converter</div>
+                <div class="card-desc">Fayllarni PDF formatiga o'tkazish</div>
+            </div>
+            <span class="badge">YANGI</span>
+        </div>
+
+        <!-- Roadmap -->
+        <div class="card card-roadmap" onclick="alert('Legal Engineer Roadmap bo\'limi tez orada ishga tushadi!')">
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <div class="card-icon" style="margin: 0;">🚀</div>
+                <div>
+                    <div class="card-title">Legal Engineer Roadmap</div>
+                    <div class="card-desc">0 dan o'rganish uchun qo'llanma</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Murojaat uchun ma'lumotlar -->
+    <div class="footer">
+        <p>Murojaat va savollar uchun:</p>
+        <div class="contact-links">
+            <a href="tel:+998998866353" class="contact-link">📞 +998 99 886 63 53</a>
+            <a href="https://t.me/abdullayev_sk" target="_blank" class="contact-link">✈️ @abdullayev_sk</a>
+        </div>
+    </div>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+
+        function openDonate() {
+            // Bu yerga o'zigizning donat havolangizni (Click, Payme yoki Stripe ssilkasini) qo'yasiz
+            window.open('https://www.uzum.uz', '_blank'); 
+        }
+
+        function sendAction(action) {
+            // Mini App ichidan botga xabar yuborish yoki funksiyani bajarish
+            if (action === 'shartnoma') {
+                tg.sendData("shartnoma_tahlili");
+            } else if (action === 'ariza') {
+                tg.sendData("davo_ariza");
+            } else if (action === 'pdf') {
+                tg.sendData("pdf_converter");
+            }
+            tg.close();
+        }
+    </script>
 </body>
 </html>

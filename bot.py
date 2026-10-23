@@ -21,7 +21,7 @@ from docx.text.paragraph import Paragraph
 import groq
 from groq import Groq
 from aiogram import Bot, Dispatcher, executor, types
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, MenuButtonWebApp
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiohttp import web
 
 try:

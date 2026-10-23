@@ -112,7 +112,7 @@ def save_analysis_history(user_id, file_name, result):
 # ==========================================
 LANG_TEXTS = {
     'uz': {
-        'welcome': "Salom! Men shartnomalarni yuridik va faktik tahlil qiluvchi Legal AI Agentman. ⚖️\n\nShartnoma faylini (PDF yoki DOCX) yuboring yoki pastdagi 'Ilova' tugmasi orqali menyuni oching.",
+        'welcome': "Salom! Men shartnomalarni yuridik va faktik tahlil qiluvchi Legal AI Agentman. ⚖️\n\nShartnoma faylini (PDF yoki DOCX) yuboring.",
         'select_lang_first': "Iltimos, avval tilni tanlang:\n\nПожалуйста, выберите язык:\n\nPlease select language:",
         'lang_changed': "✅ Til tanlandi: O'zbekcha!\n\nEndi shartnoma faylingizni yuborishingiz mumkin.",
         'analyzing': "⚖️ Shartnoma tahlil qilinmoqda. Hajmiga qarab 1-3 daqiqa ketishi mumkin...",
@@ -132,7 +132,7 @@ LANG_TEXTS = {
         'facts_title': "SHARTNOMA MATNIDAN DASTURIY AJRATILGAN REKVIZITLAR",
     },
     'ru': {
-        'welcome': "Здравствуйте! Я Legal AI Agent: юридический и фактический анализ договоров. ⚖️\n\nОтправьте файл договора (PDF или DOCX) или откройте Mini App через кнопку 'Ilova'.",
+        'welcome': "Здравствуйте! Я Legal AI Agent: юридический и фактический анализ договоров. ⚖️\n\nОтправьте файл договора (PDF или DOCX).",
         'select_lang_first': "Пожалуйста, выберите язык:",
         'lang_changed': "✅ Выбран язык: Русский!\n\nТеперь вы можете отправить файл договора.",
         'analyzing': "⚖️ Договор анализируется. В зависимости от объёма это займёт 1-3 минуты...",
@@ -152,7 +152,7 @@ LANG_TEXTS = {
         'facts_title': "РЕКВИЗИТЫ, ИЗВЛЕЧЕННЫЕ ПРОГРАММНО ИЗ ТЕКСТА ДОГОВОРА",
     },
     'en': {
-        'welcome': "Hello! I'm the Legal AI Agent for legal and factual contract analysis. ⚖️\n\nSend your contract (PDF or DOCX) or open the Mini App via 'Ilova'.",
+        'welcome': "Hello! I'm the Legal AI Agent for legal and factual contract analysis. ⚖️\n\nSend your contract (PDF or DOCX).",
         'select_lang_first': "Please select your language:",
         'lang_changed': "✅ Language selected: English!\n\nYou can now upload your contract file.",
         'analyzing': "⚖️ Analyzing the contract. Depending on length this may take 1-3 minutes...",
@@ -757,8 +757,23 @@ def get_lang_keyboard():
 # ==========================================
 @dp.message_handler(commands=['start'])
 async def start_cmd(message: types.Message):
-    lang = get_user_lang(message.from_user.id)
-    if not lang:
+    args = message.get_args()
+    lang = get_user_lang(message.from_user.id) or 'uz'
+    
+    if args == "shartnoma":
+        await message.answer("📄 Iltimos, tahlil qilish uchun shartnoma faylini (PDF yoki DOCX) chatga yuboring!")
+        return
+    elif args == "pdf":
+        await message.answer("🔄 PDF Converter bo'limi: Iltimos, PDF formatiga o'tkazmoqchi bo'lgan faylingizni yuboring.")
+        return
+    elif args == "roadmap":
+        keyboard = InlineKeyboardMarkup()
+        if WebAppInfo:
+            keyboard.add(InlineKeyboardButton(LANG_TEXTS[lang]['btn_app'], web_app=WebAppInfo(url=WEB_APP_URL)))
+        await message.answer("🚀 Legal Engineer Roadmap Mini App'ni ochish uchun pastdagi tugmani bosing: 👇", reply_markup=keyboard)
+        return
+
+    if not get_user_lang(message.from_user.id):
         await message.answer(LANG_TEXTS['uz']['select_lang_first'], reply_markup=get_lang_keyboard())
     else:
         await message.answer(LANG_TEXTS[lang]['welcome'], reply_markup=get_main_keyboard(lang))
@@ -794,18 +809,6 @@ async def cmd_roadmap(message: types.Message):
         "Legal Engineer Roadmap Mini App'ni ochish uchun pastdagi tugmani bosing: 👇",
         reply_markup=keyboard
     )
-
-
-@dp.message_handler(content_types=types.ContentType.WEB_APP_DATA)
-async def handle_web_app_data(message: types.Message):
-    data = message.web_app_data.data
-    
-    if data == "shartnoma_tahlili":
-        await message.answer("📄 Iltimos, tahlil qilish uchun shartnoma faylini (PDF yoki DOCX) chatga yuboring!")
-    elif data == "pdf_converter":
-        await message.answer("🔄 PDF Converter bo'limi: Iltimos, PDF formatiga o'tkazmoqchi bo'lgan faylingizni yuboring.")
-    elif data == "open_roadmap":
-        await message.answer("🚀 Legal Engineer Roadmap orqali o'qishni boshlang!")
 
 
 @dp.message_handler(content_types=types.ContentType.DOCUMENT)
@@ -934,15 +937,4 @@ if __name__ == '__main__':
     
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
-    
-    async def set_menu():
-        try:
-            await bot.set_chat_menu_button(
-                menu_button=MenuButtonWebApp(text="Ilova", web_app=WebAppInfo(url=WEB_APP_URL))
-            )
-        except Exception as e:
-            log.error(f"Menu button error: {e}")
-            
-    loop.run_until_complete(set_menu())
-    
     executor.start_polling(dp, skip_updates=True, loop=loop)

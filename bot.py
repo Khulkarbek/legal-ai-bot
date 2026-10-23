@@ -923,15 +923,15 @@ if __name__ == '__main__':
     asyncio.set_event_loop(loop)
     
     # Doimiy Menu tugmasini o'rnatish
-    async def set_menu():
-        try:
-            from aiogram.types import MenuButtonWebApp, WebAppInfo
-            await bot.set_chat_menu_button(
-                menu_button=MenuButtonWebApp(text="🚀 Roadmap", web_app=WebAppInfo(url=WEB_APP_URL))
-            )
-        except Exception as e:
-            log.error(f"Menu button error: {e}")
-            
-    loop.run_until_complete(set_menu())
-    
-    executor.start_polling(dp, skip_updates=True, loop=loop)
+        async def set_menu():
+            try:
+                from aiogram.types import MenuButtonWebApp, WebAppInfo
+                await bot.set_chat_menu_button(
+                    menu_button=MenuButtonWebApp(text="🚀 Roadmap", web_app=WebAppInfo(url=WEB_APP_URL))
+                )
+            except Exception as e:
+                log.error(f"Menu button error: {e}")
+                
+        loop.run_until_complete(set_menu())
+        
+        executor.start_polling(dp, skip_updates=True, loop=loop)

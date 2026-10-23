@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Legal AI Assistant - Dashboard</title>
+    <title>Legal AI Assistant</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
@@ -28,19 +28,17 @@
 
         .header {
             margin-bottom: 20px;
+            text-align: left;
         }
 
         .header h1 {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 8px;
         }
 
         .header p {
             color: var(--hint-color);
-            font-size: 14px;
+            font-size: 13px;
             margin-top: 4px;
         }
 
@@ -48,24 +46,24 @@
         .donate-banner {
             background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
             border-radius: 20px;
-            padding: 18px;
+            padding: 16px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 25px -5px rgba(244, 63, 94, 0.4);
+            margin-bottom: 16px;
+            box-shadow: 0 8px 20px -4px rgba(244, 63, 94, 0.4);
         }
 
         .donate-info h3 {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
             color: #ffffff;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
 
         .donate-info p {
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.8);
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.85);
         }
 
         .donate-btn {
@@ -77,20 +75,14 @@
             font-weight: 600;
             font-size: 13px;
             cursor: pointer;
-            transition: transform 0.2s;
-            text-decoration: none;
         }
 
-        .donate-btn:active {
-            transform: scale(0.95);
-        }
-
-        /* Grid Cards */
+        /* Uniform Grid Cards */
         .grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 12px;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
 
         .card {
@@ -99,48 +91,53 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            min-height: 130px;
+            height: 130px;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: transform 0.15s ease;
             position: relative;
             overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
         .card:active {
-            transform: scale(0.97);
+            transform: scale(0.96);
         }
 
         .card-icon {
-            font-size: 28px;
-            margin-bottom: 12px;
+            font-size: 26px;
+            margin-bottom: 8px;
         }
 
         .card-title {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 600;
             color: #ffffff;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .card-desc {
-            font-size: 12px;
+            font-size: 11px;
             color: rgba(255, 255, 255, 0.75);
+            line-height: 1.2;
         }
 
-        /* Card Gradients */
+        /* Card Themes (Bir xil o'lcham, chiroyli moslashgan ranglar) */
         .card-contract { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); }
-        .card-pdf { background: linear-gradient(135deg, #10b981 0%, #059669 100%); grid-column: span 2; }
-        .card-roadmap { background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); grid-column: span 2; }
+        .card-pdf { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+        .card-roadmap { background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); grid-column: span 2; height: 110px; flex-direction: row; align-items: center; }
 
         .badge {
             position: absolute;
-            top: 12px;
-            right: 12px;
-            background: rgba(255, 255, 255, 0.2);
-            padding: 2px 8px;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.25);
+            padding: 2px 6px;
             border-radius: 6px;
-            font-size: 10px;
-            font-weight: 600;
+            font-size: 9px;
+            font-weight: 700;
             color: #fff;
         }
 
@@ -148,27 +145,27 @@
         .footer {
             text-align: center;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
-            padding-top: 16px;
-            margin-top: 20px;
+            padding-top: 14px;
+            margin-top: 10px;
         }
 
         .footer p {
-            font-size: 13px;
+            font-size: 12px;
             color: var(--hint-color);
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .contact-links {
             display: flex;
             justify-content: center;
-            gap: 16px;
+            gap: 14px;
             align-items: center;
         }
 
         .contact-link {
             color: #38bdf8;
             text-decoration: none;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
             cursor: pointer;
         }
@@ -176,22 +173,24 @@
         /* Toast notification */
         #toast {
             visibility: hidden;
-            min-width: 200px;
-            background-color: #333;
+            min-width: 180px;
+            background-color: #1e293b;
             color: #fff;
             text-align: center;
-            border-radius: 8px;
+            border-radius: 10px;
             padding: 10px;
             position: fixed;
-            z-index: 1;
+            z-index: 10;
             left: 50%;
             bottom: 30px;
             transform: translateX(-50%);
-            font-size: 13px;
+            font-size: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
         }
         #toast.show {
             visibility: visible;
-            animation: fadein 0.5s, fadeout 0.5s 2.5s;
+            animation: fadein 0.3s, fadeout 0.3s 2.2s;
         }
         @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
         @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
@@ -201,56 +200,56 @@
 
     <div class="header">
         <h1>Legal AI Assistant ⚖️</h1>
-        <p>Barcha huquqiy xizmatlar va bo'limlar shu yerda</p>
+        <p>Barcha yuridik xizmatlar bir joyda</p>
     </div>
 
-    <!-- Donat Banner (O'zingizning to'lov havolangizni href ga yozing) -->
+    <!-- Donat Banner -->
     <div class="donate-banner">
         <div class="donate-info">
             <h3>Botni qo'llab-quvvatlang</h3>
             <p>Server va yangi funksiyalar uchun</p>
         </div>
-        <a href="https://click.uz" target="_blank" class="donate-btn">Donat</a>
+        <button class="donate-btn" onclick="openDonate()">Donat</button>
     </div>
 
-    <!-- Asosiy Bo'limlar Grid -->
+    <!-- Grid Cards (Bir xil o'lcham va dizayn) -->
     <div class="grid">
-        <!-- 1-Bo'lim: Shartnomalarni tahlil qilish -->
-        <div class="card card-contract" onclick="sendAction('shartnoma')">
+        <!-- Shartnoma tahlili -->
+        <div class="card card-contract" onclick="openAction('shartnoma')">
             <div class="card-icon">📄</div>
             <div>
                 <div class="card-title">Shartnoma tahlili</div>
-                <div class="card-desc">PDF va Word yuridik ekspertizasi</div>
+                <div class="card-desc">PDF va Word ekspertizasi</div>
             </div>
         </div>
 
-        <!-- 2-Bo'lim: Barcha fayllarni PDFga o'zgartirish -->
-        <div class="card card-pdf" onclick="sendAction('pdf')">
+        <!-- PDF Converter -->
+        <div class="card card-pdf" onclick="openAction('pdf')">
             <div class="card-icon">🔄</div>
             <div>
-                <div class="card-title">PDF Converter (Fayllarni PDFga o'tkazish)</div>
-                <div class="card-desc">Word, rasm va boshqa formatlarni PDFga o'zgartirish</div>
+                <div class="card-title">PDF Converter</div>
+                <div class="card-desc">Fayllarni PDFga o'tkazish</div>
             </div>
             <span class="badge">YANGI</span>
         </div>
 
         <!-- Roadmap -->
-        <div class="card card-roadmap" onclick="sendAction('roadmap')">
-            <div style="display: flex; align-items: center; gap: 16px;">
+        <div class="card card-roadmap" onclick="openAction('roadmap')">
+            <div style="display: flex; align-items: center; gap: 14px;">
                 <div class="card-icon" style="margin: 0;">🚀</div>
                 <div>
                     <div class="card-title">Legal Engineer Roadmap</div>
-                    <div class="card-desc">0 dan o'rganish uchun qo'llanma</div>
+                    <div class="card-desc" style="margin-top: 2px;">0 dan o'rganish uchun qo'llanma</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Murojaat uchun ma'lumotlar -->
+    <!-- Murojaat -->
     <div class="footer">
         <p>Murojaat va savollar uchun:</p>
         <div class="contact-links">
-            <a href="tel:+998998866353" class="contact-link" onclick="copyText('+998998866353', event)">📞 +998 99 886 63 53</a>
+            <a class="contact-link" onclick="copyPhone('+998998866353')">📞 +998 99 886 63 53</a>
             <a href="https://t.me/abdullayev_sk" target="_blank" class="contact-link">✈️ @abdullayev_sk</a>
         </div>
     </div>
@@ -261,23 +260,26 @@
         let tg = window.Telegram.WebApp;
         tg.expand();
 
-        function sendAction(action) {
-            if (action === 'shartnoma') {
-                tg.sendData("shartnoma_tahlili");
-            } else if (action === 'pdf') {
-                tg.sendData("pdf_converter");
-            } else if (action === 'roadmap') {
-                tg.sendData("open_roadmap");
-            }
-            tg.close();
+        function openDonate() {
+            // Donat havolangizni shu yerga qo'yasiz (masalan, Click yoki Payme ssilka)
+            tg.openLink('https://click.uz'); 
         }
 
-        function copyText(text, event) {
-            // Agar foydalanuvchi ustiga bossa, buferga nusxalaydi
-            navigator.clipboard.writeText(text).then(() => {
+        function openAction(action) {
+            if (action === 'shartnoma') {
+                tg.openTelegramLink('https://t.me/myailawyerbot?start=shartnoma');
+            } else if (action === 'pdf') {
+                tg.openTelegramLink('https://t.me/myailawyerbot?start=pdf');
+            } else if (action === 'roadmap') {
+                tg.openTelegramLink('https://t.me/myailawyerbot?start=roadmap');
+            }
+        }
+
+        function copyPhone(phone) {
+            navigator.clipboard.writeText(phone).then(() => {
                 let toast = document.getElementById("toast");
                 toast.className = "show";
-                setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
+                setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 2500);
             });
         }
     </script>

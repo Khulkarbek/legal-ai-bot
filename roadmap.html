@@ -305,7 +305,8 @@
         </div>
     </div>
 
-    let tg = window.Telegram.WebApp;
+    <script>
+        let tg = window.Telegram.WebApp;
         tg.expand();
 
         function openDonate() {
@@ -344,7 +345,6 @@
                 return;
             }
 
-            // user_id ni xavfsiz olish (agar Telegram orqali ochilmagan bo'lsa test uchun 0000 oladi)
             let userId = null;
             try {
                 userId = tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : null;
@@ -353,7 +353,6 @@
             }
 
             if (!userId) {
-                // Agar test uchun brauzerda ochilgan bo'lsa xato bermasligi uchun
                 userId = 123456789; 
             }
 
@@ -395,8 +394,6 @@
         function copyPhone(phone) {
             navigator.clipboard.writeText(phone).then(() => {
                 alert("Telefon raqam nusxalandi: " + phone);
-            });
-        }
             });
         }
     </script>

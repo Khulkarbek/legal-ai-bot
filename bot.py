@@ -47,7 +47,7 @@ log = logging.getLogger("legal-bot")
 # ==========================================
 BOT_TOKEN = "8892172868:AAEBJ7Eqz_xZkAegAUK3J9p0l4G2_HV6KgU"
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-WEB_APP_URL = os.getenv("WEB_APP_URL", "https://legal-ai-bot-v53p.onrender.com/roadmap")
+WEB_APP_URL = os.getenv("WEB_APP_URL", "https://legal-ai-bot-v53p.onrender.com/roadmap?v=2")
 
 if not GROQ_API_KEY:
     sys.exit("XATO: .env faylida GROQ_API_KEY ko'rsatilishi shart.")

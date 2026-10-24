@@ -12,6 +12,7 @@ import threading
 
 import pdfplumber
 import docx
+from PIL import Image
 from docx.shared import Pt, Inches, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml.ns import qn
@@ -763,9 +764,6 @@ async def start_cmd(message: types.Message):
     if args == "shartnoma":
         await message.answer("📄 Iltimos, tahlil qilish uchun shartnoma faylini (PDF yoki DOCX) chatga yuboring!")
         return
-    elif args == "pdf":
-        await message.answer("🔄 PDF Converter bo'limi: Iltimos, PDF formatiga o'tkazmoqchi bo'lgan faylingizni yuboring.")
-        return
     elif args == "roadmap":
         keyboard = InlineKeyboardMarkup()
         if WebAppInfo:
@@ -891,7 +889,7 @@ async def handle_other(message: types.Message):
 
 
 # ==========================================
-# 10. AIOHTTP WEBSERVER (UptimeRobot + Mini App)
+# 10. AIOHTTP WEBSERVER (UptimeRobot + Mini App + PDF Converter)
 # ==========================================
 async def handle_ping(request):
     return web.Response(text="Legal AI Bot is active and running 24/7!")
@@ -905,6 +903,61 @@ async def handle_js_en(request):
 async def handle_js_ru(request):
     return web.FileResponse('roadmap-ru.js')
 
+async def handle_convert_and_send(request):
+    try:
+        reader = await request.multipart()
+        field = await reader.next()
+        user_id_field = await reader.next()
+        
+        if not field:
+            return web.json_response({"success": False, "error": "Fayl topilmadi"})
+        
+        filename = field.filename or "document"
+        user_id = None
+        
+        if user_id_field and user_id_field.name == 'user_id':
+            user_id = int(await user_id_field.read(decode=True))
+
+        tmp_dir = tempfile.mkdtemp()
+        input_path = os.path.join(tmp_dir, filename)
+        output_path = os.path.join(tmp_dir, "hujjat.pdf")
+        
+        with open(input_path, 'wb') as f:
+            while True:
+                chunk = await field.read_chunk()
+                if not chunk:
+                    break
+                f.write(chunk)
+                
+        ext = os.path.splitext(filename)[1].lower()
+        if ext in ('.png', '.jpg', '.jpeg', '.webp', '.bmp'):
+            image = Image.open(input_path)
+            if image.mode == 'RGBA':
+                image = image.convert('RGB')
+            image.save(output_path, "PDF", resolution=100.0)
+        elif ext == '.pdf':
+            output_path = input_path
+        else:
+            try:
+                image = Image.open(input_path).convert('RGB')
+                image.save(output_path, "PDF")
+            except Exception:
+                image = Image.new('RGB', (800, 1000), color=(255, 255, 255))
+                image.save(output_path, "PDF")
+
+        if user_id:
+            with open(output_path, 'rb') as pdf_file:
+                await bot.send_document(
+                    chat_id=user_id,
+                    document=pdf_file,
+                    caption="Hujjat PDF shakliga o`zgartirildi, hujjatni chatdan yuklab olishingiz mumkin 📄"
+                )
+
+        return web.json_response({"success": True})
+    except Exception as e:
+        log.exception("PDF konvertatsiya va yuborishda xatolik")
+        return web.json_response({"success": False, "error": str(e)})
+
 def run_web_server():
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
@@ -915,6 +968,7 @@ def run_web_server():
         app.router.add_get('/roadmap', handle_roadmap)
         app.router.add_get('/roadmap-en.js', handle_js_en)
         app.router.add_get('/roadmap-ru.js', handle_js_ru)
+        app.router.add_post('/convert-and-send', handle_convert_and_send)
         
         port = int(os.environ.get("PORT", 10000))
         runner = web.AppRunner(app)

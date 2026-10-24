@@ -906,52 +906,102 @@ async def handle_js_ru(request):
 async def handle_convert_and_send(request):
     try:
         reader = await request.multipart()
-        field = await reader.next()
-        user_id_field = await reader.next()
-        
-        if not field:
-            return web.json_response({"success": False, "error": "Fayl topilmadi"})
-        
-        filename = field.filename or "document"
+        file_data = None
+        filename = "document"
         user_id = None
         
-        if user_id_field and user_id_field.name == 'user_id':
-            user_id = int(await user_id_field.read(decode=True))
-
+        async for field in reader:
+            if field.name == 'file':
+                filename = field.filename or "document"
+                file_data = await field.read()
+            elif field.name == 'user_id':
+                val = await field.read()
+                if isinstance(val, bytes):
+                    val = val.decode('utf-8')
+                user_id = int(val)
+        
+        if not file_data or not user_id:
+            return web.json_response({"success": False, "error": "Fayl yoki foydalanuvchi topilmadi"})
+        
         tmp_dir = tempfile.mkdtemp()
         input_path = os.path.join(tmp_dir, filename)
         output_path = os.path.join(tmp_dir, "hujjat.pdf")
         
         with open(input_path, 'wb') as f:
-            while True:
-                chunk = await field.read_chunk()
-                if not chunk:
-                    break
-                f.write(chunk)
+            f.write(file_data)
                 
         ext = os.path.splitext(filename)[1].lower()
-        if ext in ('.png', '.jpg', '.jpeg', '.webp', '.bmp'):
+        
+        # Video yoki audio formatlarni bloklash
+        if ext in ('.mov', '.mp4', '.avi', '.mkv', '.mp3', '.wav', '.flac'):
+            return web.json_response({"success": False, "error": "Video yoki audio formatlar PDFga o'tkazilmaydi!"})
+            
+        if ext == '.pdf':
+            # Agar fayl allaqachon PDF bo'lsa, o'zini ishlatamiz
+            output_path = input_path
+        elif ext in ('.png', '.jpg', '.jpeg', '.webp', '.bmp'):
+            # Rasm bo'lsa PDFga o'tkazamiz
             image = Image.open(input_path)
-            if image.mode == 'RGBA':
+            if image.mode in ('RGBA', 'P'):
                 image = image.convert('RGB')
             image.save(output_path, "PDF", resolution=100.0)
-        elif ext == '.pdf':
-            output_path = input_path
-        else:
+        elif ext == '.docx':
+            # Word hujjati bo'lsa, matnini o'qib PDF ko'rinishida saqlaymiz
             try:
-                image = Image.open(input_path).convert('RGB')
-                image.save(output_path, "PDF")
+                doc = docx.Document(input_path)
+                full_text = "\n".join([p.text for p in doc.paragraphs if p.text.strip()])
+                if not full_text:
+                    full_text = "Hujjat matni bo'sh."
+                
+                img = Image.new('RGB', (1240, 1754), color=(255, 255, 255))
+                d = ImageDraw.Draw(img)
+                try:
+                    font = ImageFont.truetype("arial.ttf", 24)
+                except:
+                    font = ImageFont.load_default()
+                    
+                lines = full_text.split('\n')
+                y = 50
+                for line in lines:
+                    if y > 1650:
+                        break
+                    d.text((50, y), line[:80], fill=(0, 0, 0), font=font)
+                    y += 35
+                img.save(output_path, "PDF")
+            except Exception as e:
+                log.exception("Docx to PDF xatoligi")
+                return web.json_response({"success": False, "error": "Word faylini o'qishda xatolik."})
+        else:
+            # Boshqa matnli fayllar uchun
+            try:
+                with open(input_path, 'r', encoding='utf-8', errors='ignore') as tf:
+                    text_content = tf.read()
+                
+                img = Image.new('RGB', (1240, 1754), color=(255, 255, 255))
+                d = ImageDraw.Draw(img)
+                try:
+                    font = ImageFont.truetype("arial.ttf", 24)
+                except:
+                    font = ImageFont.load_default()
+                    
+                lines = text_content.split('\n')
+                y = 50
+                for line in lines:
+                    if y > 1650:
+                        break
+                    d.text((50, y), line[:80], fill=(0, 0, 0), font=font)
+                    y += 35
+                img.save(output_path, "PDF")
             except Exception:
-                image = Image.new('RGB', (800, 1000), color=(255, 255, 255))
-                image.save(output_path, "PDF")
+                return web.json_response({"success": False, "error": "Bu format qo'llab-quvvatlanmaydi."})
 
-        if user_id:
-            with open(output_path, 'rb') as pdf_file:
-                await bot.send_document(
-                    chat_id=user_id,
-                    document=pdf_file,
-                    caption="Hujjat PDF shakliga o`zgartirildi, hujjatni chatdan yuklab olishingiz mumkin 📄"
-                )
+        # Telegram chatga yuborish
+        with open(output_path, 'rb') as pdf_file:
+            await bot.send_document(
+                chat_id=user_id,
+                document=pdf_file,
+                caption="Hujjat PDF shakliga o`zgartirildi, hujjatni chatdan yuklab olishingiz mumkin 📄"
+            )
 
         return web.json_response({"success": True})
     except Exception as e:

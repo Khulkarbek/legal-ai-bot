@@ -2,7 +2,7 @@
 <html lang="uz">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Legal AI Assistant</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
@@ -12,7 +12,7 @@
         .header { text-align: center; margin-bottom: 10px; }
         .header h1 { font-size: 24px; font-weight: 700; color: #f8fafc; margin-bottom: 4px; }
         .header p { font-size: 14px; color: #94a3b8; }
-        
+
         .card { background: #1e293b; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.2s; cursor: pointer; border: 1px solid #334155; }
         .card:active { transform: scale(0.98); }
         .card-title { font-size: 18px; font-weight: 600; color: #fff; display: flex; align-items: center; gap: 8px; }
@@ -22,7 +22,8 @@
         .donate-btn { background: #fff; color: #dc2626; border: none; padding: 8px 16px; border-radius: 20px; font-weight: 600; font-size: 14px; cursor: pointer; }
 
         .converter-card { background: linear-gradient(135deg, #059669, #047857); border: none; }
-        
+        .roadmap-card { background: linear-gradient(135deg, #7c3aed, #6d28d9); border: none; }
+
         .contacts { margin-top: 20px; text-align: center; font-size: 13px; color: #64748b; display: flex; flex-direction: column; gap: 6px; }
         .contacts span { color: #38bdf8; cursor: pointer; font-weight: 500; }
 
@@ -30,9 +31,10 @@
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 1000; padding: 16px; }
         .modal-content { background: #1e293b; width: 100%; max-width: 400px; border-radius: 20px; padding: 24px; display: flex; flex-direction: column; gap: 16px; border: 1px solid #334155; }
         .modal-title { font-size: 18px; font-weight: 600; text-align: center; color: #fff; }
-        .file-upload-box { border: 2px dashed #38bdf8; border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; background: #0f172a; }
+        .file-upload-box { border: 2px dashed #38bdf8; border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; background: #0f172a; word-break: break-all; }
         .file-upload-box input { display: none; }
         .btn-primary { background: #10b981; color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 600; cursor: pointer; font-size: 15px; }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
         .btn-danger { background: #ef4444; color: white; border: none; padding: 10px; border-radius: 12px; font-weight: 600; cursor: pointer; font-size: 14px; }
         #statusText { font-size: 13px; text-align: center; color: #38bdf8; min-height: 20px; }
     </style>
@@ -47,10 +49,10 @@
         <!-- Donat kartochkasi -->
         <div class="card donate-card" onclick="openDonate()">
             <div>
-                <div class="card-title" style="color: #fff;">Botni qo'llab-quvvatlang</div>
+                <div class="card-title">Botni qo'llab-quvvatlang</div>
                 <div class="card-desc" style="color: #fee2e2;">Server va yangi funksiyalar uchun</div>
             </div>
-            <button class="donate-btn">Donat</button>
+            <button class="donate-btn" type="button">Donat</button>
         </div>
 
         <!-- Shartnoma tahlili -->
@@ -62,54 +64,60 @@
         <!-- PDF Converter -->
         <div class="card converter-card" onclick="openPDFConverter()">
             <div class="card-title">🔄 PDF Converter</div>
-            <div class="card-desc" style="color: #d1fae5;">Istalgan faylni PDF formatiga o'tkazish</div>
+            <div class="card-desc" style="color: #d1fae5;">Word, rasm yoki matnli faylni PDF formatiga o'tkazish</div>
         </div>
 
         <!-- Roadmap -->
-        <div class="card" onclick="openAction('roadmap')" style="background: linear-gradient(135deg, #7c3aed, #6d28d9);">
+        <div class="card roadmap-card" onclick="openAction('roadmap')">
             <div class="card-title">🚀 Legal Engineer Roadmap</div>
             <div class="card-desc" style="color: #ede9fe;">0 dan o'rganish uchun qo'llanma</div>
         </div>
 
         <div class="contacts">
             Murojaat va savollar uchun:
-            <div>📞 <span onclick="copyPhone('+998998866353')">+998 99 886 63 53</span></div>
-            <div>✈️ <span onclick="copyPhone('@abdullayev_sk')">@abdullayev_sk</span></div>
+            <div>📞 <span onclick="copyText('+998998866353')">+998 99 886 63 53</span></div>
+            <div>✈️ <span onclick="copyText('@abdullayev_sk')">@abdullayev_sk</span></div>
         </div>
     </div>
 
     <!-- Fayl yuklash oynasi (Modal) -->
-    <div id="pdfModal" class="modal">
+    <div id="pdfModal" class="modal" onclick="if (event.target === this) closePDFConverter()">
         <div class="modal-content">
             <div class="modal-title">🔄 PDF Converter</div>
-            <p style="font-size: 13px; color: #94a3b8; text-align: center;">Word, Rasm yoki matnli faylni tanlang</p>
-            
+            <p style="font-size: 13px; color: #94a3b8; text-align: center;">Word (.docx), rasm yoki matnli faylni tanlang (maks. 20 MB)</p>
+
             <label class="file-upload-box">
-                <input type="file" id="fileInput" onchange="handleFileSelect(this)">
+                <input type="file" id="fileInput" accept=".pdf,.docx,.txt,.md,.csv,.json,.png,.jpg,.jpeg,.webp,.bmp,.gif,.tif,.tiff" onchange="handleFileSelect(this)">
                 <span id="fileNameDisplay" style="font-size: 14px; color: #38bdf8;">📁 Faylni tanlash uchun bosing</span>
             </label>
 
             <div id="statusText"></div>
 
-            <button class="btn-primary" onclick="uploadAndConvert()">Chatga yuborish</button>
-            <button class="btn-danger" onclick="closePDFConverter()">Yopish</button>
+            <button class="btn-primary" id="sendBtn" type="button" onclick="uploadAndConvert()">Chatga yuborish</button>
+            <button class="btn-danger" type="button" onclick="closePDFConverter()">Yopish</button>
         </div>
     </div>
 
     <script>
-        let tg = window.Telegram.WebApp;
-        tg.expand();
+        const tg = (window.Telegram && window.Telegram.WebApp) ? window.Telegram.WebApp : null;
+        const MAX_BYTES = 20 * 1024 * 1024;
+        const BOT_USERNAME = 'myailawyerbot';
+
+        if (tg) {
+            try { tg.ready(); tg.expand(); } catch (e) {}
+        }
 
         function openDonate() {
-            tg.openLink('https://click.uz'); 
+            const url = 'https://click.uz';
+            if (tg && tg.openLink) tg.openLink(url);
+            else window.open(url, '_blank');
         }
 
         function openAction(action) {
-            if (action === 'shartnoma') {
-                tg.openTelegramLink('https://t.me/myailawyerbot?start=shartnoma');
-            } else if (action === 'roadmap') {
-                tg.openTelegramLink('https://t.me/myailawyerbot?start=roadmap');
-            }
+            if (action !== 'shartnoma' && action !== 'roadmap') return;
+            const url = 'https://t.me/' + BOT_USERNAME + '?start=' + action;
+            if (tg && tg.openTelegramLink) tg.openTelegramLink(url);
+            else window.open(url, '_blank');
         }
 
         function openPDFConverter() {
@@ -121,71 +129,80 @@
             document.getElementById('statusText').innerText = '';
             document.getElementById('fileNameDisplay').innerText = '📁 Faylni tanlash uchun bosing';
             document.getElementById('fileInput').value = '';
+            document.getElementById('sendBtn').disabled = false;
         }
 
         function handleFileSelect(input) {
             if (input.files && input.files[0]) {
                 document.getElementById('fileNameDisplay').innerText = '✅ ' + input.files[0].name;
+                document.getElementById('statusText').innerText = '';
             }
         }
 
-        function uploadAndConvert() {
-            let fileInput = document.getElementById('fileInput');
+        async function uploadAndConvert() {
+            const fileInput = document.getElementById('fileInput');
+            const status = document.getElementById('statusText');
+            const btn = document.getElementById('sendBtn');
+
             if (!fileInput.files || fileInput.files.length === 0) {
-                alert('Iltimos, avval fayl tanlang!');
+                status.innerText = '⚠️ Iltimos, avval fayl tanlang!';
+                return;
+            }
+            const file = fileInput.files[0];
+            if (file.size > MAX_BYTES) {
+                status.innerText = '⚠️ Fayl hajmi 20 MB dan oshmasligi kerak.';
                 return;
             }
 
-            let userId = null;
-            try {
-                userId = tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : null;
-            } catch (e) {
-                userId = null;
+            // Server foydalanuvchini Telegram imzosi (initData) orqali tekshiradi
+            const initData = (tg && tg.initData) ? tg.initData : '';
+            if (!initData) {
+                status.innerText = "⚠️ Mini App'ni Telegram bot ichidan oching.";
+                return;
             }
 
-            if (!userId) {
-                userId = 123456789; 
-            }
+            const formData = new FormData();
+            formData.append('init_data', initData);
+            formData.append('file', file, file.name);
 
-            let formData = new FormData();
-            formData.append('file', fileInput.files[0]);
-            formData.append('user_id', userId);
-
-            let status = document.getElementById('statusText');
+            btn.disabled = true;
             status.innerText = "⏳ Fayl PDF formatiga o'tkazilmoqda va chatga yuborilmoqda...";
 
-            fetch('/convert-and-send', {
-                method: 'POST',
-                body: formData
-            })
-            .then(async response => {
-                let text = await response.text();
+            try {
+                const response = await fetch('/convert-and-send', { method: 'POST', body: formData });
+                const text = await response.text();
+                let data;
                 try {
-                    return JSON.parse(text);
+                    data = JSON.parse(text);
                 } catch (e) {
-                    throw new Error("Serverdan noto'g'ri javob keldi: " + text.substring(0, 50));
+                    throw new Error("Serverdan noto'g'ri javob keldi (" + response.status + ")");
                 }
-            })
-            .then(data => {
                 if (data.success) {
-                    status.innerText = "✅ Tayyor! Fayl chatga yuborildi.";
+                    status.innerText = '✅ Tayyor! Fayl chatga yuborildi.';
                     setTimeout(() => {
                         closePDFConverter();
-                        tg.close();
+                        if (tg) tg.close();
                     }, 1500);
                 } else {
-                    status.innerText = "⚠️ Xato: " + (data.error || "Noma'lum xatolik");
+                    status.innerText = '⚠️ Xato: ' + (data.error || "Noma'lum xatolik");
+                    btn.disabled = false;
                 }
-            })
-            .catch(err => {
-                status.innerText = "⚠️ Xatolik yuz berdi: " + err.message;
-            });
+            } catch (err) {
+                status.innerText = '⚠️ Xatolik yuz berdi: ' + err.message;
+                btn.disabled = false;
+            }
         }
 
-        function copyPhone(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                alert("Nusxalandi: " + text);
-            });
+        function copyText(text) {
+            const done = () => {
+                if (tg && tg.showAlert) tg.showAlert('Nusxalandi: ' + text);
+                else alert('Nusxalandi: ' + text);
+            };
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(done).catch(done);
+            } else {
+                done();
+            }
         }
     </script>
 </body>

@@ -2,306 +2,97 @@
 <html lang="uz">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Legal AI Assistant</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root {
-            --bg-color: var(--tg-theme-bg-color, #0f172a);
-            --text-color: var(--tg-theme-text-color, #f8fafc);
-            --hint-color: var(--tg-theme-hint-color, #94a3b8);
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: #0f172a; color: #f8fafc; padding: 16px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        .container { width: 100%; max-width: 480px; display: flex; flex-direction: column; gap: 16px; }
+        .header { text-align: center; margin-bottom: 10px; }
+        .header h1 { font-size: 24px; font-weight: 700; color: #f8fafc; margin-bottom: 4px; }
+        .header p { font-size: 14px; color: #94a3b8; }
+        
+        .card { background: #1e293b; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.2s; cursor: pointer; border: 1px solid #334155; }
+        .card:active { transform: scale(0.98); }
+        .card-title { font-size: 18px; font-weight: 600; color: #fff; display: flex; align-items: center; gap: 8px; }
+        .card-desc { font-size: 13px; color: #94a3b8; }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
+        .donate-card { background: linear-gradient(135deg, #ef4444, #dc2626); border: none; flex-direction: row; align-items: center; justify-content: space-between; }
+        .donate-btn { background: #fff; color: #dc2626; border: none; padding: 8px 16px; border-radius: 20px; font-weight: 600; font-size: 14px; cursor: pointer; }
 
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            padding: 16px;
-            padding-bottom: 40px;
-        }
+        .converter-card { background: linear-gradient(135deg, #059669, #047857); border: none; }
+        
+        .contacts { margin-top: 20px; text-align: center; font-size: 13px; color: #64748b; display: flex; flex-direction: column; gap: 6px; }
+        .contacts span { color: #38bdf8; cursor: pointer; font-weight: 500; }
 
-        .header {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        .header h1 {
-            font-size: 22px;
-            font-weight: 700;
-        }
-
-        .header p {
-            color: var(--hint-color);
-            font-size: 13px;
-            margin-top: 4px;
-        }
-
-        /* Donat Banner */
-        .donate-banner {
-            background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
-            border-radius: 20px;
-            padding: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 16px;
-            box-shadow: 0 8px 20px -4px rgba(244, 63, 94, 0.4);
-        }
-
-        .donate-info h3 {
-            font-size: 15px;
-            font-weight: 600;
-            color: #ffffff;
-            margin-bottom: 2px;
-        }
-
-        .donate-info p {
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.85);
-        }
-
-        .donate-btn {
-            background: #ffffff;
-            color: #e11d48;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 13px;
-            cursor: pointer;
-        }
-
-        /* Grid Cards */
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .card {
-            border-radius: 20px;
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 130px;
-            cursor: pointer;
-            transition: transform 0.15s ease;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-
-        .card:active {
-            transform: scale(0.96);
-        }
-
-        .card-icon {
-            font-size: 26px;
-            margin-bottom: 8px;
-        }
-
-        .card-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: #ffffff;
-            margin-bottom: 2px;
-        }
-
-        .card-desc {
-            font-size: 11px;
-            color: rgba(255, 255, 255, 0.75);
-            line-height: 1.2;
-        }
-
-        .card-contract { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); }
-        .card-pdf { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
-        .card-roadmap { background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); grid-column: span 2; height: 110px; flex-direction: row; align-items: center; }
-
-        .badge {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(255, 255, 255, 0.25);
-            padding: 2px 6px;
-            border-radius: 6px;
-            font-size: 9px;
-            font-weight: 700;
-            color: #fff;
-        }
-
-        /* PDF Converter Modal */
-        #pdfModal {
-            display: none;
-            background: rgba(15, 23, 42, 0.95);
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 100;
-            padding: 20px;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-content {
-            background: #1e293b;
-            padding: 24px;
-            border-radius: 20px;
-            width: 100%;
-            max-width: 350px;
-            text-align: center;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .modal-content h3 {
-            margin-bottom: 12px;
-            font-size: 18px;
-        }
-
-        .file-upload-box {
-            border: 2px dashed #38bdf8;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 15px;
-            cursor: pointer;
-            background: rgba(56, 189, 248, 0.05);
-            display: block;
-        }
-
-        .file-upload-box input {
-            display: none;
-        }
-
-        .action-btn {
-            background: #10b981;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 10px;
-            font-weight: 600;
-            width: 100%;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
-        .close-btn {
-            background: #ef4444;
-            margin-top: 8px;
-        }
-
-        #statusText {
-            margin-top: 12px;
-            font-size: 13px;
-            color: #38bdf8;
-        }
-
-        /* Footer */
-        .footer {
-            text-align: center;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            padding-top: 14px;
-            margin-top: 20px;
-        }
-
-        .footer p {
-            font-size: 12px;
-            color: var(--hint-color);
-            margin-bottom: 6px;
-        }
-
-        .contact-links {
-            display: flex;
-            justify-content: center;
-            gap: 14px;
-            align-items: center;
-        }
-
-        .contact-link {
-            color: #38bdf8;
-            text-decoration: none;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-        }
+        /* Modal oynasi */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 1000; padding: 16px; }
+        .modal-content { background: #1e293b; width: 100%; max-width: 400px; border-radius: 20px; padding: 24px; display: flex; flex-direction: column; gap: 16px; border: 1px solid #334155; }
+        .modal-title { font-size: 18px; font-weight: 600; text-align: center; color: #fff; }
+        .file-upload-box { border: 2px dashed #38bdf8; border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; background: #0f172a; }
+        .file-upload-box input { display: none; }
+        .btn-primary { background: #10b981; color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 600; cursor: pointer; font-size: 15px; }
+        .btn-danger { background: #ef4444; color: white; border: none; padding: 10px; border-radius: 12px; font-weight: 600; cursor: pointer; font-size: 14px; }
+        #statusText { font-size: 13px; text-align: center; color: #38bdf8; min-height: 20px; }
     </style>
 </head>
 <body>
-
-    <div class="header">
-        <h1>Legal AI Assistant ⚖️</h1>
-        <p>Barcha yuridik xizmatlar bir joyda</p>
-    </div>
-
-    <!-- Donat Banner -->
-    <div class="donate-banner">
-        <div class="donate-info">
-            <h3>Botni qo'llab-quvvatlang</h3>
-            <p>Server va yangi funksiyalar uchun</p>
+    <div class="container">
+        <div class="header">
+            <h1>Legal AI Assistant ⚖️</h1>
+            <p>Barcha yuridik xizmatlar bir joyda</p>
         </div>
-        <button class="donate-btn" onclick="openDonate()">Donat</button>
-    </div>
 
-    <!-- Grid Cards -->
-    <div class="grid">
-        <div class="card card-contract" onclick="openAction('shartnoma')">
-            <div class="card-icon">📄</div>
+        <!-- Donat kartochkasi -->
+        <div class="card donate-card" onclick="openDonate()">
             <div>
-                <div class="card-title">Shartnoma tahlili</div>
-                <div class="card-desc">PDF va Word ekspertizasi</div>
+                <div class="card-title" style="color: #fff;">Botni qo'llab-quvvatlang</div>
+                <div class="card-desc" style="color: #fee2e2;">Server va yangi funksiyalar uchun</div>
             </div>
+            <button class="donate-btn">Donat</button>
         </div>
 
-        <div class="card card-pdf" onclick="openPDFConverter()">
-            <div class="card-icon">🔄</div>
-            <div>
-                <div class="card-title">PDF Converter</div>
-                <div class="card-desc">Istalgan faylni PDFga o'tkazish</div>
-            </div>
-            <span class="badge">YANGI</span>
+        <!-- Shartnoma tahlili -->
+        <div class="card" onclick="openAction('shartnoma')">
+            <div class="card-title">📄 Shartnoma tahlili</div>
+            <div class="card-desc">PDF va Word ekspertizasi va yuridik xulosa</div>
         </div>
 
-        <div class="card card-roadmap" onclick="openAction('roadmap')">
-            <div style="display: flex; align-items: center; gap: 14px;">
-                <div class="card-icon" style="margin: 0;">🚀</div>
-                <div>
-                    <div class="card-title">Legal Engineer Roadmap</div>
-                    <div class="card-desc" style="margin-top: 2px;">0 dan o'rganish uchun qo'llanma</div>
-                </div>
-            </div>
+        <!-- PDF Converter -->
+        <div class="card converter-card" onclick="openPDFConverter()">
+            <div class="card-title">🔄 PDF Converter</div>
+            <div class="card-desc" style="color: #d1fae5;">Istalgan faylni PDF formatiga o'tkazish</div>
+        </div>
+
+        <!-- Roadmap -->
+        <div class="card" onclick="openAction('roadmap')" style="background: linear-gradient(135deg, #7c3aed, #6d28d9);">
+            <div class="card-title">🚀 Legal Engineer Roadmap</div>
+            <div class="card-desc" style="color: #ede9fe;">0 dan o'rganish uchun qo'llanma</div>
+        </div>
+
+        <div class="contacts">
+            Murojaat va savollar uchun:
+            <div>📞 <span onclick="copyPhone('+998998866353')">+998 99 886 63 53</span></div>
+            <div>✈️ <span onclick="copyPhone('@abdullayev_sk')">@abdullayev_sk</span></div>
         </div>
     </div>
 
-    <!-- PDF Converter Modal Oynasi -->
-    <div id="pdfModal">
+    <!-- Fayl yuklash oynasi (Modal) -->
+    <div id="pdfModal" class="modal">
         <div class="modal-content">
-            <h3>🔄 PDF Converter</h3>
-            <p style="font-size: 12px; color: #94a3b8; margin-bottom: 15px;">Istalgan faylni tanlang (Word, Rasm va h.k.)</p>
+            <div class="modal-title">🔄 PDF Converter</div>
+            <p style="font-size: 13px; color: #94a3b8; text-align: center;">Word, Rasm yoki matnli faylni tanlang</p>
             
-            <label class="file-upload-box" id="dropZone">
-                <span id="fileNameDisplay">📁 Faylni tanlash uchun bosing</span>
+            <label class="file-upload-box">
                 <input type="file" id="fileInput" onchange="handleFileSelect(this)">
+                <span id="fileNameDisplay" style="font-size: 14px; color: #38bdf8;">📁 Faylni tanlash uchun bosing</span>
             </label>
 
-            <button class="action-btn" onclick="uploadAndConvert()">Chatga yuborish</button>
-            <button class="action-btn close-btn" onclick="closePDFConverter()">Yopish</button>
-            
             <div id="statusText"></div>
-        </div>
-    </div>
 
-    <!-- Murojaat -->
-    <div class="footer">
-        <p>Murojaat va savollar uchun:</p>
-        <div class="contact-links">
-            <a class="contact-link" onclick="copyPhone('+998998866353')">📞 +998 99 886 63 53</a>
-            <a href="https://t.me/abdullayev_sk" target="_blank" class="contact-link">✈️ @abdullayev_sk</a>
+            <button class="btn-primary" onclick="uploadAndConvert()">Chatga yuborish</button>
+            <button class="btn-danger" onclick="closePDFConverter()">Yopish</button>
         </div>
     </div>
 
@@ -391,9 +182,9 @@
             });
         }
 
-        function copyPhone(phone) {
-            navigator.clipboard.writeText(phone).then(() => {
-                alert("Telefon raqam nusxalandi: " + phone);
+        function copyPhone(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert("Nusxalandi: " + text);
             });
         }
     </script>

@@ -347,7 +347,7 @@
 
             let userId = tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : null;
             if (!userId) {
-                alert('Foydalanuvchi maʼlumotlari aniqlanmadi!');
+                alert('Foydalanuvchi maʼlumotlari aniqlanmadi! Botni toza boshidan oching.');
                 return;
             }
 
@@ -371,11 +371,12 @@
                         tg.close();
                     }, 1500);
                 } else {
-                    throw new Error(data.error || "Xatolik");
+                    // SERVERDAN KELGAN ANIQ XATONI EKRANDA KO'RSATAMIZ
+                    status.innerText = "⚠️ Xato: " + (data.error || "Noma'lum xatolik");
                 }
             })
             .catch(err => {
-                status.innerText = "⚠️ Xatolik yuz berdi. Qayta urinib ko'ring.";
+                status.innerText = "⚠️ Tarmoq xatosi: " + err.message;
             });
         }
 

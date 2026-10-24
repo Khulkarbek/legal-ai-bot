@@ -305,8 +305,7 @@
         </div>
     </div>
 
-    <script>
-        let tg = window.Telegram.WebApp;
+    let tg = window.Telegram.WebApp;
         tg.expand();
 
         function openDonate() {
@@ -340,15 +339,22 @@
 
         function uploadAndConvert() {
             let fileInput = document.getElementById('fileInput');
-            if (fileInput.files.length === 0) {
+            if (!fileInput.files || fileInput.files.length === 0) {
                 alert('Iltimos, avval fayl tanlang!');
                 return;
             }
 
-            let userId = tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : null;
+            // user_id ni xavfsiz olish (agar Telegram orqali ochilmagan bo'lsa test uchun 0000 oladi)
+            let userId = null;
+            try {
+                userId = tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : null;
+            } catch (e) {
+                userId = null;
+            }
+
             if (!userId) {
-                alert('Foydalanuvchi maʼlumotlari aniqlanmadi! Botni toza boshidan oching.');
-                return;
+                // Agar test uchun brauzerda ochilgan bo'lsa xato bermasligi uchun
+                userId = 123456789; 
             }
 
             let formData = new FormData();
@@ -362,7 +368,14 @@
                 method: 'POST',
                 body: formData
             })
-            .then(response => response.json())
+            .then(async response => {
+                let text = await response.text();
+                try {
+                    return JSON.parse(text);
+                } catch (e) {
+                    throw new Error("Serverdan noto'g'ri javob keldi: " + text.substring(0, 50));
+                }
+            })
             .then(data => {
                 if (data.success) {
                     status.innerText = "✅ Tayyor! Fayl chatga yuborildi.";
@@ -371,18 +384,19 @@
                         tg.close();
                     }, 1500);
                 } else {
-                    // SERVERDAN KELGAN ANIQ XATONI EKRANDA KO'RSATAMIZ
                     status.innerText = "⚠️ Xato: " + (data.error || "Noma'lum xatolik");
                 }
             })
             .catch(err => {
-                status.innerText = "⚠️ Tarmoq xatosi: " + err.message;
+                status.innerText = "⚠️ Xatolik yuz berdi: " + err.message;
             });
         }
 
         function copyPhone(phone) {
             navigator.clipboard.writeText(phone).then(() => {
                 alert("Telefon raqam nusxalandi: " + phone);
+            });
+        }
             });
         }
     </script>

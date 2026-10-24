@@ -36,6 +36,33 @@
         .btn-primary { background: #10b981; color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 600; cursor: pointer; font-size: 15px; }
         .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
         .btn-danger { background: #ef4444; color: white; border: none; padding: 10px; border-radius: 12px; font-weight: 600; cursor: pointer; font-size: 14px; }
+        /* ===== Donat: bank kartasi dizayni ===== */
+        .modal.show { animation: fadeIn 0.2s ease; }
+        .modal.show .modal-content { animation: popIn 0.28s cubic-bezier(.2,.9,.3,1.2); }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes popIn { from { opacity: 0; transform: translateY(18px) scale(0.94); } to { opacity: 1; transform: none; } }
+
+        .heart { font-size: 40px; text-align: center; animation: beat 1.4s ease-in-out infinite; }
+        @keyframes beat { 0%, 100% { transform: scale(1); } 15% { transform: scale(1.18); } 30% { transform: scale(1); } 45% { transform: scale(1.12); } }
+
+        .bank-card { position: relative; overflow: hidden; border-radius: 20px; padding: 22px 20px; color: #fff; cursor: pointer;
+            background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 55%, #a855f7 100%);
+            box-shadow: 0 12px 30px rgba(99,102,241,0.45), inset 0 1px 0 rgba(255,255,255,0.35); }
+        .bank-card::before { content: ''; position: absolute; top: -60px; right: -50px; width: 190px; height: 190px; border-radius: 50%; background: rgba(255,255,255,0.14); }
+        .bank-card::after { content: ''; position: absolute; bottom: -80px; left: -40px; width: 200px; height: 200px; border-radius: 50%; background: rgba(255,255,255,0.08); }
+        .bank-card > * { position: relative; z-index: 1; }
+        .bank-top { display: flex; justify-content: space-between; align-items: center; }
+        .chip { width: 42px; height: 32px; border-radius: 7px; background: linear-gradient(135deg, #fde68a, #f59e0b); box-shadow: inset 0 0 0 1px rgba(0,0,0,0.15); }
+        .bank-tag { font-size: 12px; font-weight: 700; letter-spacing: 1.5px; opacity: 0.9; }
+        .bank-number { font-size: 23px; font-weight: 700; letter-spacing: 2.5px; margin-top: 26px; font-family: 'Courier New', monospace; text-shadow: 0 2px 6px rgba(0,0,0,0.25); }
+        .bank-bottom { margin-top: 20px; }
+        .bank-label { font-size: 10px; letter-spacing: 1.2px; opacity: 0.75; text-transform: uppercase; }
+        .bank-owner { font-size: 15px; font-weight: 600; letter-spacing: 1px; margin-top: 2px; }
+        .tap-hint { font-size: 12px; text-align: center; color: #64748b; margin-top: -4px; }
+        .copy-ok { font-size: 14px; text-align: center; min-height: 22px; font-weight: 600; color: #34d399; }
+        .btn-copy { background: linear-gradient(135deg, #10b981, #059669); color: #fff; border: none; padding: 13px; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 15px; box-shadow: 0 6px 16px rgba(16,185,129,0.35); }
+        .btn-copy:active { transform: scale(0.98); }
+        .btn-close { background: transparent; color: #94a3b8; border: 1px solid #334155; padding: 11px; border-radius: 12px; font-weight: 600; cursor: pointer; font-size: 14px; }
         #statusText { font-size: 13px; text-align: center; color: #38bdf8; min-height: 20px; }
     </style>
 </head>
@@ -80,6 +107,30 @@
         </div>
     </div>
 
+    <!-- Donat oynasi (Modal) -->
+    <div id="donateModal" class="modal" onclick="if (event.target === this) closeDonate()">
+        <div class="modal-content">
+            <div class="heart">❤️</div>
+            <div class="modal-title">Botni qo'llab-quvvatlang</div>
+            <p style="font-size: 13px; color: #94a3b8; text-align: center;">Server va yangi funksiyalar uchun yordamingiz uchun rahmat!</p>
+            <div class="bank-card" onclick="copyCard()">
+                <div class="bank-top">
+                    <div class="chip"></div>
+                    <div class="bank-tag">UZCARD / HUMO</div>
+                </div>
+                <div class="bank-number" id="cardNumber"></div>
+                <div class="bank-bottom">
+                    <div class="bank-label">Karta egasi</div>
+                    <div class="bank-owner" id="cardOwner"></div>
+                </div>
+            </div>
+            <div class="tap-hint">Kartani bossangiz ham raqam nusxalanadi</div>
+            <div class="copy-ok" id="copyStatus"></div>
+            <button class="btn-copy" type="button" onclick="copyCard()">📋 Karta raqamini nusxalash</button>
+            <button class="btn-close" type="button" onclick="closeDonate()">Yopish</button>
+        </div>
+    </div>
+
     <!-- Fayl yuklash oynasi (Modal) -->
     <div id="pdfModal" class="modal" onclick="if (event.target === this) closePDFConverter()">
         <div class="modal-content">
@@ -107,10 +158,64 @@
             try { tg.ready(); tg.expand(); } catch (e) {}
         }
 
+        // ====== SHU YERGA O'ZINGIZNING MA'LUMOTLARINGIZNI YOZING ======
+        const CARD_NUMBER = '9860 0101 0252 4377';   // karta raqami
+        const CARD_OWNER  = 'ABDULLAEV KHULKARBEK';          // karta egasi
+        // ===============================================================
+
+        // Clipboard'ga nusxalash: avval zamonaviy usul, bo'lmasa eski usul (Telegram WebView uchun)
+        function writeClipboard(text) {
+            return new Promise((resolve, reject) => {
+                const legacy = () => {
+                    try {
+                        const ta = document.createElement('textarea');
+                        ta.value = text;
+                        ta.setAttribute('readonly', '');
+                        ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;';
+                        document.body.appendChild(ta);
+                        ta.focus();
+                        ta.select();
+                        ta.setSelectionRange(0, text.length);
+                        const done = document.execCommand('copy');
+                        document.body.removeChild(ta);
+                        done ? resolve() : reject(new Error('copy failed'));
+                    } catch (e) { reject(e); }
+                };
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(text).then(resolve).catch(legacy);
+                } else {
+                    legacy();
+                }
+            });
+        }
+
+        function copyCard(silentHaptic) {
+            const raw = CARD_NUMBER.replace(/\s+/g, '');
+            const status = document.getElementById('copyStatus');
+            return writeClipboard(raw).then(() => {
+                status.style.color = '#34d399';
+                status.innerText = '✅ Karta raqami nusxalandi!';
+                try { if (tg && tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success'); } catch (e) {}
+            }).catch(() => {
+                status.style.color = '#fbbf24';
+                status.innerText = "Avtomatik nusxalanmadi. Karta ustiga bosib ushlab, qo'lda nusxalang.";
+            });
+        }
+
         function openDonate() {
-            const url = 'https://click.uz';
-            if (tg && tg.openLink) tg.openLink(url);
-            else window.open(url, '_blank');
+            document.getElementById('cardNumber').innerText = CARD_NUMBER;
+            document.getElementById('cardOwner').innerText = CARD_OWNER;
+            document.getElementById('copyStatus').innerText = '';
+            const m = document.getElementById('donateModal');
+            m.style.display = 'flex';
+            m.classList.add('show');
+            copyCard();   // oyna ochilishi bilan raqam avtomatik clipboard'ga tushadi
+        }
+
+        function closeDonate() {
+            const m = document.getElementById('donateModal');
+            m.style.display = 'none';
+            m.classList.remove('show');
         }
 
         function openAction(action) {

@@ -1,5 +1,8 @@
 aiogram==2.25.1
+aiohttp
 groq
 pdfplumber
 python-docx
 python-dotenv
+Pillow
+reportlab

@@ -65,7 +65,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 # ==========================================
 # 1. SOZLAMALAR
 # ==========================================
-BOT_TOKEN = os.getenv("8892172868:AAFL7lhs-tQKvN0ipQ4an7aKO-CY87uTzPU")
+BOT_TOKEN = os.getenv("BOT_TOKEN")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 WEB_APP_URL = os.getenv("WEB_APP_URL", "https://legal-ai-bot-v53p.onrender.com/roadmap?v=4")
 

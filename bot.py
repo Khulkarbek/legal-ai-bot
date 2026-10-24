@@ -1027,17 +1027,69 @@ async def handle_convert_and_send(request):
             send_telegram_document_sync,
             BOT_TOKEN,
             user_id,
-            output_path,
-            "Hujjat PDF shakliga o`zgartirildi, hujjatni chatdan yuklab olishingiz mumkin 📄"
-        )
+           async def handle_convert_and_send(request):
+    try:
+        reader = await request.multipart()
+        file_data = None
+        filename = "document"
+        user_id = None
         
-        if not success:
-            return web.json_response({"success": False, "error": f"Telegram xatosi: {err_desc}"})
-
-        return web.json_response({"success": True})
-    except Exception as e:
-        log.exception("PDF konvertatsiya va yuborishda xatolik")
-        return web.json_response({"success": False, "error": str(e)})
+        async for field in reader:
+            if field.name == 'file':
+                filename = field.filename or "document"
+                file_data = await field.read()
+            elif field.name == 'user_id':
+                val = await field.read()
+                if isinstance(val, bytes):
+                    val = val.decode('utf-8')
+                user_id = int(val)
+        
+        if not file_data or not user_id:
+            return web.json_response({"success": False, "error": "Fayl yoki foydalanuvchi topilmadi"})
+        
+        tmp_dir = tempfile.mkdtemp()
+        input_path = os.path.join(tmp_dir, filename)
+        output_path = os.path.join(tmp_dir, "hujjat.pdf")
+        
+        with open(input_path, 'wb') as f:
+            f.write(file_data)
+                
+        ext = os.path.splitext(filename)[1].lower()
+        
+        if ext in ('.mov', '.mp4', '.avi', '.mkv', '.mp3', '.wav', '.flac'):
+            return web.json_response({"success": False, "error": "Video yoki audio formatlar PDFga o'tkazilmaydi!"})
+            
+        if ext == '.pdf':
+            output_path = input_path
+        elif ext in ('.png', '.jpg', '.jpeg', '.webp', '.bmp'):
+            image = Image.open(input_path)
+            if image.mode in ('RGBA', 'P'):
+                image = image.convert('RGB')
+            image.save(output_path, "PDF", resolution=100.0)
+        elif ext == '.docx':
+            try:
+                doc = docx.Document(input_path)
+                full_text = "\n".join([p.text for p in doc.paragraphs if p.text.strip()])
+                if not full_text:
+                    full_text = "Hujjat matni bo'sh."
+                
+                img = Image.new('RGB', (1240, 1754), color=(255, 255, 255))
+                d = ImageDraw.Draw(img)
+                try:
+                    font = ImageFont.truetype("arial.ttf", 24)
+                except:
+                    font = ImageFont.load_default()
+                    
+                lines = full_text.split('\n')
+                y = 50
+                for line in lines:
+                    if y > 1650:
+                        break
+                    d.text((50, y), line[:80], fill=(0, 0, 0), font=font)
+                    y += 35
+                img.save(output_path, "PDF")
+            except Exception:
+                return web.json_response({"success": False, "error": "Word faylini o'qishda xatolik."})
         else:
             # Boshqa matnli fayllar uchun
             try:
@@ -1062,14 +1114,22 @@ async def handle_convert_and_send(request):
             except Exception:
                 return web.json_response({"success": False, "error": "Bu format qo'llab-quvvatlanmaydi."})
 
-        # Telegram chatga yuborish
-        with open(output_path, 'rb') as pdf_file:
-            await bot.send_document(
-                chat_id=user_id,
-                document=pdf_file,
-                caption="Hujjat PDF shakliga o`zgartirildi, hujjatni chatdan yuklab olishingiz mumkin 📄"
-            )
+        # Telegram chatga xavfsiz yuborish
+        success, err_desc = await asyncio.to_thread(
+            send_telegram_document_sync,
+            BOT_TOKEN,
+            user_id,
+            output_path,
+            "Hujjat PDF shakliga o`zgartirildi, hujjatni chatdan yuklab olishingiz mumkin 📄"
+        )
+        
+        if not success:
+            return web.json_response({"success": False, "error": f"Telegram xatosi: {err_desc}"})
 
+        return web.json_response({"success": True})
+    except Exception as e:
+        log.exception("PDF konvertatsiya va yuborishda xatolik")
+        return web.json_response({"success": False, "error": str(e)})
         return web.json_response({"success": True})
     except Exception as e:
         log.exception("PDF konvertatsiya va yuborishda xatolik")
